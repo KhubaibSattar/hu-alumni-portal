@@ -80,8 +80,8 @@ const Navbar = () => {
                 </Typography>
                 <Typography
                     component={Link}
-                    to="/chat"
-                    className={`${classes.heading} ${location.pathname === '/chat' ? classes.active : ''}`}
+                    to="/Chat"
+                    className={`${classes.heading} ${location.pathname === '/Chat' ? classes.active : ''}`}
                     variant="h5"
                     align="center"
                 >

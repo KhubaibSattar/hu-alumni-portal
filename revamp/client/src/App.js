@@ -9,7 +9,7 @@ import Auth from "./components/Auth/Auth";
 import Profile from "./components/Profile/Profile";
 import AlumniForum from "./components/AlumniForum/AlumniForum";
 import Dashboard from "./components/Dashboard";
-import Chat from "./components/chatpage/chat";
+import Chat from "./components/Chat/Chat";
 import { createTheme } from "@mui/material/styles";
 import { themeSettings } from "./theme";
 import { BrowserRouter, Switch, Route, Redirect } from 'react-router-dom';
@@ -39,7 +39,7 @@ const App = () => {
                         <Route path="/bar" exact component={Bar}/>
                         <Route path="/custom" exact component={StudentList}/>
                         {/* <Route path="/barchart(studentsworking)" exact component={barChart_students_working}/> */}
-                        <Route path="/chat" exact component={Chat}/>
+                        <Route path="/Chat" exact component={Chat}/>
                         <Route path="/" exact component={() => (!user ? <Auth /> : <Redirect to="/posts" />)} />
                     </Switch>
                 </Container>

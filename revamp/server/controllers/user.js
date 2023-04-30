@@ -133,7 +133,7 @@ export const followUser = async (req, res) => {
         return acc;
       }, {});
       
-      res.status(200).json({ following: user.following, followers: user.followers, likes });
+      res.status(200).json({ following: user.following, followers: user.followers, likes , skills: user.skills});
     } catch (error) {
       res.status(500).json({ message: 'Error fetching user data', error });
     }

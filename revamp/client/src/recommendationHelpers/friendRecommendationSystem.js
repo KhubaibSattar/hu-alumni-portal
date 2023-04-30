@@ -21,35 +21,27 @@ const cosineSimilarity = (vectorA, vectorB) => {
 
   
   
-  export const createInteractionMatrix = async (users, userLikesData) => {
+  export const createInteractionMatrix = async (users) => {
     const interactionMatrix = [];
-  
+    const usersWithSkills = users.filter(user => user.skills && user.skills[0]);
     try {
-      const { data: allPosts } = await fetchAllPosts(); // Fetch all posts directly
-      console.log("All Posts:", allPosts);
+      for (const userA of usersWithSkills) {
+        const userSkillsA = userA.skills[0].split('\n').map(skill => skill.trim());
+        const interactionVector = new Array(usersWithSkills.length).fill(0);
   
-      for (const user of users) {
-        const interactionVector = new Array(allPosts.length).fill(0.001);
-  
-        const matrixEntry = {
-          userId: user._id,
-          vector: interactionVector,
-        };
-  
-        const userLikes = userLikesData[user._id];
-        if (userLikes) {
-          for (const postId of userLikes) {
-            const postIndex = allPosts.findIndex((post) => post._id === postId);
-            console.log(`Liked Post Index for ${postId}:`, postIndex);
-            console.log("user: ", user._id);
-            console.log("vector: ", interactionVector);
-            if (postIndex !== -1) {
-              interactionVector[postIndex] = 1;
-            }
+        for (const userB of usersWithSkills) {
+          if (userA._id !== userB._id) {
+            const userSkillsB = userB.skills[0].split('\n').map(skill => skill.trim());
+            const commonSkills = userSkillsA.filter(skill => userSkillsB.includes(skill)).length;
+            
+            interactionVector[usersWithSkills.findIndex((user) => user._id === userB._id)] = commonSkills;
           }
         }
   
-        interactionMatrix.push(matrixEntry);
+        interactionMatrix.push({
+          userId: userA._id,
+          vector: interactionVector,
+        });
       }
     } catch (error) {
       console.error("Error creating interaction matrix:", error);
@@ -58,6 +50,8 @@ const cosineSimilarity = (vectorA, vectorB) => {
   
     return interactionMatrix;
   };
+  
+  
   
   
   
@@ -76,28 +70,32 @@ const cosineSimilarity = (vectorA, vectorB) => {
       }
       similarityScores.push({ userId: interactionMatrix[i].userId, scores: userSimilarities }); // Add the userId property here
     }
- 
+    console.log("Interaction Matrix:", interactionMatrix);
+    console.log("Similarity Scores:", similarityScores);
     return similarityScores;
   };
 
   export const generateFriendRecommendations = (targetUserId, allUsersData, similarityScores) => {
     const finalSimilarityScores = [];
-    const currentUserScores = similarityScores.find(row => row.userId === targetUserId).scores;
-  
-    for (let otherUser of allUsersData) {
-      if (targetUserId !== otherUser._id) {
-        const otherUserScore = currentUserScores.find(row => row.userId === otherUser._id);
-  
-        if (otherUserScore) {
+    console.log("target: ", targetUserId);
+    const currentUserScores = similarityScores.find(row => row.userId === targetUserId).scores.slice(1); // Start from the second element
+    
+    for (let otherUser of similarityScores.find(row => row.userId === targetUserId).scores) {
+
+      if (targetUserId !== otherUser.userId) {
+        if (otherUser) {
           finalSimilarityScores.push({
-            userId: otherUser._id,
-            similarity: otherUserScore.similarity,
+            userId: otherUser.userId,
+            similarity: otherUser.similarity,
           });
         } else {
-          console.warn(`Score not found for user: ${otherUser._id}`);
+          console.warn(`Score not found for user: ${otherUser.userId}`);
         }
       }
     }
+  
     console.log("Final Similarity Scores:", finalSimilarityScores);
     return finalSimilarityScores;
   };
+  
+  

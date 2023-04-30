@@ -15,6 +15,7 @@ const userSchema = mongoose.Schema({
     employmentdate: {type: Date},
     huID: {type: String},
     id: {type: String},
+    skills: [{type: String}],
     following: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
     followers: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
 

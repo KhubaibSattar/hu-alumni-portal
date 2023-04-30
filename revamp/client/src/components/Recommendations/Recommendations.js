@@ -17,45 +17,34 @@ const Recommendations = () => {
   const allUserData = useSelector((state) => state.user.fetchedUsers);
 
   const fetchData = async () => {
-    if (user) {
-      try {
-        // Fetch the total number of posts
-        dispatch(fetchNumPosts());
+  if (user) {
+    try {
+      // Fetch the total number of posts
+      dispatch(fetchNumPosts());
+      const targetUserData = await dispatch(getUserById(user.result._id));
+      // Get top recommended users
+      const recommendations = await getTopRecommendedUsers(user.result._id, allUserData);
 
-        // Fetch user likes
-        
-
-        const userLikesData = {};
-        for (const u of allUserData) {
-          const userLikes = await dispatch(fetchUserLikes(u._id));
-          userLikesData[u._id] = userLikes;
-        }
-
-        
-
-        const recommendations = await getTopRecommendedUsers(user.result._id, allUserData, userLikesData);
-        
-
-        // Fetch user objects for each recommended user
-        const recommendedUsersData = [];
-        for (const recommendation of recommendations) {
-          const userData = await dispatch(getUserById(recommendation.userId));
-          recommendedUsersData.push(userData);
-        }
-
-        
-        setRecommendedUsers(recommendedUsersData);
-        console.log(recommendedUsersData);
-      } catch (error) {
-        console.error("Error fetching recommendations:", error);
-      } finally {
-        setLoading(false);
+      // Fetch user objects for each recommended user
+      const recommendedUsersData = [];
+      for (const recommendation of recommendations) {
+        const userData = await dispatch(getUserById(recommendation.userId));
+        recommendedUsersData.push(userData);
       }
-    } else {
-      console.log("User not found");
+
+      setRecommendedUsers(recommendedUsersData);
+      console.log(recommendedUsersData);
+    } catch (error) {
+      console.error("Error fetching recommendations:", error);
+    } finally {
       setLoading(false);
     }
-  };
+  } else {
+    console.log("User not found");
+    setLoading(false);
+  }
+};
+
 
   useEffect(() => {
     const fetchAllUsers = async () => {
@@ -74,7 +63,7 @@ const Recommendations = () => {
   return (
     <>
       <Typography variant="h6" align="center">
-        Friend Recommendations
+        People to Follow
       </Typography>
       {loading ? (
         <CircularProgress />
